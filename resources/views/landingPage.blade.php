@@ -17,6 +17,7 @@
             </div>
         </div>
     </section>
+
     <section class="bg-[#F7D8E0]">
         <div class="flex flex-col md:flex-row items-center justify-between px-6 py-16 md:px-40 md:py-20 gap-4 md:gap-6">
             <div class="space-y-3 max-w-lg text-center md:text-left">

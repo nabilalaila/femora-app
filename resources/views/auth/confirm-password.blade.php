@@ -18,10 +18,12 @@
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
+
         <div class="flex justify-end mt-4">
             <x-primary-button>
                 {{ __('Confirm') }}
             </x-primary-button>
         </div>
     </form>
+
 </x-guest-layout>

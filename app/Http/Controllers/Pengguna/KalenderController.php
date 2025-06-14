@@ -16,48 +16,67 @@ class KalenderController extends Controller
 
    public function index()
     {
-    $user = auth()->user();
-    $pola_kebiasaan = PolaKebiasaan::where('user_id', $user->id)->first();
+        $user = auth()->user();
+        $pola_kebiasaan = PolaKebiasaan::where('user_id', $user->id)->first();
 
-    $periods = Period::with('bloodRecords')
-    ->where('user_id', auth()->id())
-    ->get()
-    ->flatMap(function ($period) {
-        $start = Carbon::parse($period->tanggal_mulai)->startOfDay();
-        $end = Carbon::parse($period->tanggal_berakhir)->endOfDay();
-        $dates = [];
+        $periods = Period::with('bloodRecords')
+        ->where('user_id', auth()->id())
+        ->get()
+        ->flatMap(function ($period) {
+            $start = Carbon::parse($period->tanggal_mulai)->startOfDay();
+            $end = Carbon::parse($period->tanggal_berakhir)->endOfDay();
+            $dates = [];
 
-        while ($start->lte($end)) {
-            $matchingBlood = $period->bloodRecords->firstWhere(function ($record) use ($start) {
-                return Carbon::parse($record->waktu_keluar)->toDateString() === $start->toDateString();
-            });
+            while ($start->lte($end)) {
+                $matchingBlood = $period->bloodRecords->firstWhere(function ($record) use ($start) {
+                    return Carbon::parse($record->waktu_keluar)->toDateString() === $start->toDateString();
+                });
 
-            $dates[] = [
-                'id' => $period->id,
-                'date' => $start->toDateString(),
-                'jenis' => $period->jenis,
-                'waktu_keluar' => optional($matchingBlood)->waktu_keluar,
-                'warna' => optional($matchingBlood)->warna,
-                'is_fullday' => optional($matchingBlood)->is_fullday,
-            ];
+                $dates[] = [
+                    'id' => $period->id,
+                    'date' => $start->toDateString(),
+                    'jenis' => $period->jenis,
+                    'waktu_keluar' => optional($matchingBlood)->waktu_keluar,
+                    'warna' => optional($matchingBlood)->warna,
+                    'is_fullday' => optional($matchingBlood)->is_fullday,
+                ];
 
-            $start->addDay();
-        }
+                $start->addDay();
+            }
+            return $dates;
+        });
+        return view('User.kalenderHaid', [
+            'noNavbar' => true,
+            'periodDates' => $periods,
+            'isEdit' => false,
+        ]);
+    }
 
-        return $dates;
-    });
+    public function update(Request $request){
+        $request->validate([
+            'date' => 'required|date',
+            'waktu_keluar' => 'required|date_format:H:i',
+            'warna' => 'required|in:merah tua,coklat,hitam,merah terang,pink,oranye,abu-abu',
+            'is_fullday' => 'required|in:0,1',
+        ]);
+
+        $tanggal = $request->date;
+        $waktuKeluar = Carbon::parse($tanggal . ' ' . $request->waktu_keluar);
+
+        $editRecord = BloodRecord::where('user_id', auth()->id())
+            ->where('waktu_keluar', $waktuKeluar)
+            ->first();
 
 
-    return view('User.kalenderHaid', [
-        'noNavbar' => true,
-        'periodDates' => $periods,
-        'isEdit' => false,
-    ]);
-    dd($periods->pluck('waktu_keluar'));
+        $editRecord->update([
+            'waktu_keluar' => $waktuKeluar,
+            'warna' => $request->warna,
+            'is_fullday'=>$request->is_fullday
+        ]);
+        return back()->with('success', 'Anda berhasil mengubah data keluar darah');
+    }
 
-}
-
-
+    // public 
 
     public function store(Request $request)
     {
@@ -274,9 +293,5 @@ class KalenderController extends Controller
         }
 
         return redirect()->back()->with('success', 'Data darah berhasil disimpan sebagai ' . $jenis);
-    }
-
-    public function edit(){
-        return view ('User.dashboardPengguna');
     }
 }
