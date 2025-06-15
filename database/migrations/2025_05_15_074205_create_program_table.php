@@ -14,9 +14,13 @@ return new class extends Migration
         Schema::create('program', function (Blueprint $table) {
         $table->id();
         $table->string('nama_program');
-        $table->datetime('tanggal_pelaksanaan');
+        $table->date('tanggal_buka');
+        $table->date('tanggal_tutup');
+        $table->date('tanggal_pelaksanaan');
         $table->boolean('is_online');
+        $table->boolean('is_delete');
         $table->text('deskripsi_program');
+        $table->text('info_peserta')->nullable();
         $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
         $table->string('foto_header')->nullable();
         $table->bigInteger('max_peserta')->default(null);

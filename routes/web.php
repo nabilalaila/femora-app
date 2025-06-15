@@ -7,6 +7,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Pengguna\KalenderController;
 use App\Http\Controllers\Pengguna\istiqrarController;
+use App\Http\Controllers\Admin\PendaftaranController;
+use App\Http\Controllers\Admin\ProgramController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,8 +27,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/kalenderHaid', [KalenderController::class, 'store'])->name('kalender.store');
     Route::put('/kalenderHaid', [KalenderController::class, 'update'])->name('kalender.update');
     Route::delete('/kalenderHaid', [KalenderController::class, 'destroy'])->name('kalender.destroy');
-    // Route::delete('/kalenderHaid', function () {
-    // dd('route delete berhasil!')->name('kalender.destroy');
+
+    Route::get('/PendaftaranProgram', [PendaftaranController::class, 'index'])->name('pendaftaran.index');
+
+    Route::get('/KelolaProgram', [ProgramController::class, 'index'])->name('admin.program.index');
+    Route::post('/KelolaProgram', [ProgramController::class, 'store'])->name('admin.program.store');
+    Route::put('/KelolaProgram', [ProgramController::class, 'update'])->name('admin.program.update');
+    Route::delete('/KelolaProgram', [ProgramController::class, 'destroy'])->name('admin.program.destroy');
+
 });
 
 

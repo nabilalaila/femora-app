@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Femora</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="module" src="https://unpkg.com/cally"></script>
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <meta name="route-store" content="{{ route('kalender.store') }}">
     <meta name="route-update" content="{{ route('kalender.update') }}">
     <meta name="route-destroy" content="{{ route('kalender.destroy') }}">
@@ -35,10 +35,12 @@
                 @endif
             </aside>
         @endif
+        @php
+            $marginLeft =
+                Auth::check() && Auth::user()->role === 'admin' ? 'md:ml-[325px]' : (Auth::check() ? 'md:ml-12' : '');
+        @endphp
 
-        <main
-            class="flex-1 transition-all duration-300
-        {{ empty($noSidebar) && Auth::check() ? 'md:ml-12' : '' }}">
+        <main class="flex-1 transition-all duration-300 {{ $marginLeft }}">
             @yield('content')
             @yield('scripts')
         </main>
@@ -47,7 +49,7 @@
     @if (empty($noNavbar))
         @include('components.footer')
     @endif
-
+    @stack('scripts')
 </body>
 
 </html>

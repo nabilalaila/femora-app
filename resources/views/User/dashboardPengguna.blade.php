@@ -44,7 +44,7 @@
             </div>
         @endif
         <div class="ml-100">
-            <div class="mt-10 lg:mt-5">
+            <div class="mt-10 lg:mt-5 items-center">
                 <div class="mx-10 py-10 bg-[#F9E8EE] rounded-xl text-center text-xl">
                     <strong>Hai, {{ Auth::user()->name }}!</strong>
                     <p class="text-base mt-2 px-32 leading-relaxed">

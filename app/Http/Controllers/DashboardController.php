@@ -15,7 +15,7 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         if ($user->role === 'admin') {
-            return view('page.dashboardAdmin', ['noNavbar' => true]);
+            return view('Admin.PendaftaranProgram', ['noNavbar' => true]);
         } elseif ($user->role === 'pengguna') {
             $user = auth()->user();
             $user = auth()->user();

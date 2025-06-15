@@ -70,11 +70,13 @@
     </div>
 </div>
 
-<script>
-    const menuToggle = document.getElementById('menuToggle');
-    const sidebar = document.getElementById('sidebar');
+@push('scripts')
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
 
-    menuToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('-translate-x-full');
-    });
-</script>
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+        });
+    </script>
+@endpush
