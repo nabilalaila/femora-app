@@ -53,7 +53,7 @@
                     </div>
                     <div class="flex items-center gap-x-2">
                         <svg width="40" height="40">
-                            <circle r="15" cx="20" cy="20" fill="white" fill-opacity="1" stroke="#abe0e9"
+                            <circle r="15" cx="20" cy="20" fill="white" fill-opacity="1" stroke="#4DA8DA"
                                 stroke-width="2" stroke-dasharray="5" />
                         </svg>
                         <p class="text-sm">Istihadhah</p>
@@ -70,6 +70,8 @@
                 <input type="hidden" name="_method" id="formMethod" value="POST">
                 <input type="hidden" name="date" id="recordDateModal">
                 <input type="hidden" name="record_id" id="recordId">
+                <input type="hidden" name="period_id" id="periodIdField">
+                <input type="hidden" name="waktu_keluar" id="recordWaktuKeluarModal">
 
                 <p class="text-sm text-gray-600">
                     Tanggal dipilih: <span id="selectedDateDisplay" class="font-medium text-gray-900"></span>
@@ -123,4 +125,5 @@
     <script>
         const periodDates = @json($periodDates);
     </script>
+
 @endsection

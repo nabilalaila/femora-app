@@ -61,22 +61,128 @@ class KalenderController extends Controller
         ]);
 
         $tanggal = $request->date;
-        $waktuKeluar = Carbon::parse($tanggal . ' ' . $request->waktu_keluar);
+
+        if($request->waktu_keluar){
+            $waktuKeluar = Carbon::parse($tanggal . ' ' . $request->waktu_keluar);
+        }
+        else{
+            $waktuKeluar = Carbon::parse($tanggal)->copy()->endOfDay();
+        }
 
         $editRecord = BloodRecord::where('user_id', auth()->id())
             ->where('waktu_keluar', $waktuKeluar)
             ->first();
 
+        $period = Period::where('user_id', auth()->id())
+            ->whereDate('tanggal_mulai', '<=', $waktuKeluar)
+            ->whereDate('tanggal_berakhir', '>=', $waktuKeluar)
+            ->first();
 
-        $editRecord->update([
+        if($editRecord){
+            $editRecord->update([
             'waktu_keluar' => $waktuKeluar,
             'warna' => $request->warna,
             'is_fullday'=>$request->is_fullday
-        ]);
+            ]);
+        }
+        else{
+            BloodRecord::create([
+                'waktu_keluar' => $waktuKeluar,
+                'warna' => $request->warna,
+                'is_fullday'=>$request->is_fullday,
+                'jenis' => $period->jenis,
+                'period_id' => $period-> id,
+                'user_id' => auth()->id(),
+            ]);
+        }
         return back()->with('success', 'Anda berhasil mengubah data keluar darah');
     }
 
-    // public 
+    public function destroy(Request $request){
+        $request->validate([
+            'date' => 'required|date',
+            'waktu_keluar' => 'nullable|date_format:H:i',
+        ]);
+
+        $tanggal = $request->date;
+
+        if($request->waktu_keluar){
+            $waktuKeluar = Carbon::parse($tanggal . ' ' . $request->waktu_keluar);
+        }
+        else{
+            $waktuKeluar = Carbon::parse($tanggal)->copy()->endOfDay();
+        }
+
+        $bloodRecord = BloodRecord::where('user_id', auth()->id())
+            ->where('waktu_keluar', $waktuKeluar)
+            ->first();
+
+        $awalPeriod = Period::where('user_id', auth()->id())
+            ->whereDate('tanggal_mulai', $waktuKeluar)
+            ->first();
+
+        $akhirPeriod = Period::where('user_id', auth()->id())
+            ->whereDate('tanggal_berakhir', $waktuKeluar)
+            ->first();
+
+        if ($awalPeriod) {
+            $tanggalMulaiLama = Carbon::parse($awalPeriod->tanggal_mulai);
+            $tanggalBerakhirLama = Carbon::parse($awalPeriod->tanggal_berakhir);
+
+            if ($tanggalMulaiLama->equalTo($tanggalBerakhirLama)) {
+                $awalPeriod->delete();
+            }
+
+            elseif ($waktuKeluar->equalTo($tanggalMulaiLama)) {
+                $awalPeriod->update([
+                    'tanggal_mulai' => $tanggalMulaiLama->copy()->addDay(),
+                    'waktu_batas' => $tanggalMulaiLama->copy()->addDay(),
+                ]);
+            }
+
+            $istihadhahTerdampak = Period::where('user_id', auth()->id())
+                ->where('jenis', 'istihadhah')
+                ->whereDate('tanggal_mulai', $tanggalBerakhirLama)
+                ->get();
+
+            foreach ($istihadhahTerdampak as $istihadhah) {
+                $istihadhah->update([
+                    'tanggal_mulai' => Carbon::parse($istihadhah->tanggal_mulai)->addDay(),
+                    'batas_akhir' => optional($bloodRecord)->batas_akhir?->copy()->addDay(),
+                ]);
+            }
+        }
+        else if ($akhirPeriod) {
+            $tanggalMulaiLama = Carbon::parse($akhirPeriod->tanggal_mulai);
+            $tanggalBerakhirLama = Carbon::parse($akhirPeriod->tanggal_berakhir);
+
+            if ($tanggalMulaiLama->equalTo($tanggalBerakhirLama)) {
+                $akhirPeriod->delete();
+            }
+
+            elseif ($waktuKeluar->equalTo($tanggalBerakhirLama)) {
+                $akhirPeriod->update([
+                    'tanggal_berakhir' => $tanggalBerakhirLama->copy()->subDay(),
+                ]);
+            }
+
+            $istihadhahTerdampak = Period::where('user_id', auth()->id())
+                ->where('jenis', 'istihadhah')
+                ->whereDate('tanggal_mulai', $tanggalBerakhirLama)
+                ->get();
+
+            foreach ($istihadhahTerdampak as $istihadhah) {
+                $istihadhah->update([
+                    'tanggal_mulai' => Carbon::parse($istihadhah->tanggal_mulai)->subDay(),
+                    'batas_akhir' => optional($bloodRecord)->batas_akhir?->copy()->subDay(),
+                ]);
+            }
+        }
+        if ($bloodRecord) {
+                $bloodRecord->delete();
+            }
+        return back()->with('success', 'Anda berhasil menguhapus data keluar darah');
+    }
 
     public function store(Request $request)
     {
@@ -98,9 +204,8 @@ class KalenderController extends Controller
 
         if($isMustaqirrah){
             $adatHaid = $pola_kebiasaan->durasi;
-            $adatSuci = $pola_kebiasaan->siklus - $adatHaid;
+            $adatSuci = $pola_kebiasaan->panjang_siklus - $adatHaid;
         }
-
         $existing = BloodRecord::where('user_id', $userId)
             ->whereDate('waktu_keluar', $tanggal)
             ->first();
@@ -144,11 +249,6 @@ class KalenderController extends Controller
         }
 
         $group = $group->unique()->sort()->values();
-
-        $startDate = Carbon::parse($group->first());
-        $endDate = Carbon::parse($group->last());
-        $durasi = $startDate->diffInDays($endDate) + 1;
-        $hariKe = $group->search($tanggal) + 1;
         $hasAnyPeriod = Period::where('user_id', $userId)->exists();
 
         $lastHaid = Period::where('user_id', $userId)
@@ -156,15 +256,10 @@ class KalenderController extends Controller
             ->orderByDesc('tanggal_berakhir')
             ->first();
 
-        if (!$hasAnyPeriod || ($tanggalCarbon > $lastHaid->batas_akhir)) {
-            $tanggalAwalGroup = $tanggalCarbon;
-        } else {
-            $lastHaid = Period::where('user_id', $userId)
-                ->where('jenis', 'haid')
-                ->orderByDesc('tanggal_berakhir')
-                ->first();
-
+        if ($hasAnyPeriod) {
             $tanggalAwalGroup = $lastHaid->tanggal_mulai;
+        } else {
+            $tanggalAwalGroup = $tanggalCarbon;
         }
 
         if($isMustaqirrah){
@@ -178,18 +273,15 @@ class KalenderController extends Controller
 
         $isLayakHaid = true;
 
-        if ($tanggalCarbon->greaterThan($tanggalBatas) && $tanggalCarbon->lessThan($tanggalTidakLayakBerakhir)) {
+        if ($tanggalCarbon->greaterThanOrEqualTo($tanggalBatas) && $tanggalCarbon->lessThanOrEqualTo($tanggalTidakLayakBerakhir)) {
             $isLayakHaid = false;
         }
-
-        $durasiHaid = $adatHaid ?? 6;
 
         if ($isLayakHaid) {
             $jenis = 'haid';
         } else {
             $jenis = 'istihadhah';
         }
-
         $existingPeriod = Period::where('user_id', $userId)
             ->where('jenis', $jenis)
             ->orderByDesc('tanggal_berakhir')
@@ -209,10 +301,16 @@ class KalenderController extends Controller
             }
 
             if ($selisihHari < 0) {
-                $existingPeriod->update([
+                if ($tanggalCarbon < $existingPeriod->tanggal_mulai){
+                    $existingPeriod->update([
+                    'tanggal_mulai' => $tanggalCarbon->copy(),
+                ]);
+                }
+                else if($tanggalCarbon > $existingPeriod->tanggal_akhir){
+                    $existingPeriod->update([
                     'tanggal_berakhir' => $tanggalCarbon->copy()->endOfDay(),
                 ]);
-                $status = 'update';
+                }
             } else {
                 if($jenis == 'haid'){
                     $existingPeriod = Period::create([
@@ -235,7 +333,6 @@ class KalenderController extends Controller
                             'tanggal_berakhir' => $existingHaid->batas_akhir,
                         ]);
                     }
-
                     $existingPeriod = Period::create([
                         'user_id' => $userId,
                         'tanggal_mulai' => $combinedDateTime,
@@ -267,7 +364,6 @@ class KalenderController extends Controller
                         'tanggal_berakhir' => $existingHaid->batas_akhir,
                     ]);
                 }
-
                 $existingPeriod = Period::create([
                     'user_id' => $userId,
                     'tanggal_mulai' => $combinedDateTime,
@@ -291,7 +387,6 @@ class KalenderController extends Controller
                 'period_id' => $existingPeriod->id,
             ]);
         }
-
         return redirect()->back()->with('success', 'Data darah berhasil disimpan sebagai ' . $jenis);
     }
 }

@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (foundPeriod) {
                 const strokeColor = foundPeriod.jenis === 'haid' ? '#d96e94'
-                                : foundPeriod.jenis === 'istihadhah' ? '#abe0e9'
+                                : foundPeriod.jenis === 'istihadhah' ? '#4DA8DA'
                                 : '#abe9b4';
                 dayCell.style.border = `2px dashed ${strokeColor}`;dayCell.setAttribute('data-has-record', 'true');
                 dayCell.setAttribute('data-id', foundPeriod.id);
@@ -56,10 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
             dayCell.addEventListener('click', () => {
                 const hasRecord = dayCell.dataset.hasRecord === "true";
                 const displayDate = dayCell.getAttribute('data-date');
-                const recordData = hasRecord ? periodDates.find(p => {
-                    const formattedDate = new Date(p.date).toISOString().slice(0, 10);
-                    return formattedDate === displayDate;
-                }) : null;
+                const recordData = periodDates.find(p => {
+                const formattedDate = new Date(p.date).toISOString().slice(0, 10);
+                return formattedDate === displayDate;
+            });
 
                 const form = document.getElementById('recordForm');
                 const title = document.getElementById('modalTitle');
@@ -71,36 +71,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('recordDateModal').value = displayDate;
                 dateDisplay.textContent = displayDate;
 
-                if (hasRecord && recordData){
-                    console.log(recordData);
-                    form.action = `/kalender/${recordData.id}`;
+                if (recordData) {
+                    form.action = document.querySelector('meta[name="route-destroy"]').content;
                     methodField.value = 'PUT';
                     title.textContent = "Edit Period";
                     submitBtn.textContent = "Update"
                     deleteBtn.classList.remove('hidden');
+
                     deleteBtn.onclick = () => {
-                        if (confirm("Apakah anda yakin menghapus data ini? penghapusan ini akan mempengaruhi hasil prediksi anda")){
-                            form.action = `/kalender/${recordData.id}`;
+                        if (confirm("Apakah anda yakin menghapus data ini? Penghapusan ini akan mempengaruhi hasil prediksi anda.")) {
+                            form.action = document.querySelector('meta[name="route-destroy"]').content;
+                            document.getElementById('periodIdField').value = recordData.id;
                             methodField.value = 'DELETE';
                             form.submit();
                         }
                     };
-
-                    if (recordData.waktu_keluar) {
-                        const waktu = new Date(recordData.waktu_keluar);
-                        const jam = waktu.getHours().toString().padStart(2, '0');
-                        const menit = waktu.getMinutes().toString().padStart(2, '0');
-                        document.getElementById('waktu_keluar').value = `${jam}:${menit}`;
-                    } else {
-                        document.getElementById('waktu_keluar').value = '';
-                    }
+                    document.getElementById('waktu_keluar').value = recordData.waktu_keluar
+                        ? new Date(recordData.waktu_keluar).toTimeString().slice(0,5)
+                        : '';
                     document.getElementById('is_fullday').checked = recordData.is_fullday == 1;
-                    document.getElementById('warna').value = recordData.warna;
+                    document.getElementById('warna').value = recordData.warna ?? '';
                 }
                 else{
-                    form.action = form.action = document.querySelector('meta[name="route-store"]').content;;
+                    form.action = document.querySelector('meta[name="route-store"]').content;
                     methodField.value = 'POST';
                     title.textContent = "Catat Period";
+                    document.getElementById('recordDateModal').value = displayDate;
+                    const matchingPeriod = periodDates.find(p => {
+                            const formattedDate = new Date(p.date).toISOString().slice(0, 10);
+                            return formattedDate === displayDate;
+                        });
+                    document.getElementById('periodIdField').value = matchingPeriod?.id ?? '';
                     submitBtn.textContent = "Simpan";
                     deleteBtn.classList.add('hidden');
 

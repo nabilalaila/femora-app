@@ -25,12 +25,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/kalenderHaid', [KalenderController::class, 'store'])->name('kalender.store');
     Route::put('/kalenderHaid', [KalenderController::class, 'update'])->name('kalender.update');
     Route::delete('/kalenderHaid', [KalenderController::class, 'destroy'])->name('kalender.destroy');
+    // Route::delete('/kalenderHaid', function () {
+    // dd('route delete berhasil!')->name('kalender.destroy');
+});
 
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
     Route::post('/dashboard', [istiqrarController::class, 'store'])->name('istiqrar.store');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
-});
+;
 
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
