@@ -7,6 +7,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Pengguna\KalenderController;
 use App\Http\Controllers\Pengguna\istiqrarController;
+use App\Http\Controllers\Pengguna\DaftarProgramController;
+use App\Http\Controllers\Pengguna\RiwayatProgramController;
 use App\Http\Controllers\Admin\PendaftaranController;
 use App\Http\Controllers\Admin\ProgramController;
 use Illuminate\Support\Facades\Route;
@@ -29,12 +31,17 @@ Route::middleware('auth')->group(function () {
     Route::delete('/kalenderHaid', [KalenderController::class, 'destroy'])->name('kalender.destroy');
 
     Route::get('/PendaftaranProgram', [PendaftaranController::class, 'index'])->name('pendaftaran.index');
+    Route::put('/PendaftaranProgram', [PendaftaranController::class, 'update'])->name('pendaftaran.update');
 
     Route::get('/KelolaProgram', [ProgramController::class, 'index'])->name('admin.program.index');
     Route::post('/KelolaProgram', [ProgramController::class, 'store'])->name('admin.program.store');
     Route::put('/KelolaProgram', [ProgramController::class, 'update'])->name('admin.program.update');
     Route::delete('/KelolaProgram', [ProgramController::class, 'destroy'])->name('admin.program.destroy');
 
+    Route::get('/Program', [DaftarProgramController::class, 'index'])->name('pengguna.program.index');
+    Route::post('/Program', [DaftarProgramController::class, 'store'])->name('pengguna.program.store');
+
+    Route::get('/RiwayatProgram', [RiwayatProgramController::class, 'index'])->name('pengguna.RiwayatProgram.index');
 });
 
 

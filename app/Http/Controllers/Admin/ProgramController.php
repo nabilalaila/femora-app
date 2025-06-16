@@ -41,11 +41,9 @@ class ProgramController extends Controller
         $validated['is_delete'] = 0;
         $validated['created_by'] = auth()->id();
 
-try {
-    Program::create($validated);
-} catch (\Exception $e) {
-    dd('Gagal simpan:', $e->getMessage());
-}
+
+        Program::create($validated);
+
         return redirect()->back()->with('success', 'Program berhasil ditambahkan.');
     }
 
@@ -80,20 +78,17 @@ try {
             $filename = $request->file('foto_header')->store('program', 'public');
             $program->foto_header = '/storage/' . $filename;
         }
-        
-        try {
-            $program->save();
-        } catch (\Exception $e) {
-            dd('Gagal simpan:', $e->getMessage());
-        }
+
+        $program->save();
+
         return redirect()->back()->with('success', 'Program berhasil diperbarui.');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        $program = Program::findOrFail($id);
+        $id = $request->input('program_id');
+        $program = Program::findOrFail($request->program_id);
         $program->delete();
-
         return redirect()->back()->with('success', 'Program berhasil dihapus.');
     }
 }

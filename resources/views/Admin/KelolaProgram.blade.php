@@ -135,6 +135,7 @@
         <form method="POST" id="deleteProgramForm" class="hidden">
             @csrf
             @method('DELETE')
+            <input type="hidden" name="program_id" id="programIdDelete">
         </form>
     </x-modal>
 @endsection
@@ -169,14 +170,16 @@
                     document.getElementById('deskripsi_program').value = program.deskripsi_program;
                     document.getElementById('tanggal_buka').value = program.tanggal_buka;
                     document.getElementById('tanggal_tutup').value = program.tanggal_tutup;
-                    document.getElementById('tanggal_pelaksanaan').value = program.tanggal_pelaksanaan;
+                    document.getElementById('tanggal_pelaksanaan').value = program
+                        .tanggal_pelaksanaan;
                     document.getElementById('max_peserta').value = program.max_peserta;
                     document.getElementById('is_online').value = program.is_online;
                     document.getElementById('harga_program').value = program.harga_program;
 
                     deleteBtn.classList.remove('hidden');
-                    deleteForm.setAttribute('action', '{{ route('admin.program.destroy') }}');
+                    document.getElementById('programIdDelete').value = program.id;
 
+                    deleteForm.setAttribute('action', '{{ route('admin.program.destroy') }}');
                     openModal();
                 });
             });

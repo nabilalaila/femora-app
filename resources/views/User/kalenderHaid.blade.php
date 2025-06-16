@@ -6,7 +6,6 @@
     </div>
     <div class="bg-[#F9E8EE] flex flex-col m-10 p-10 rounded-2xl">
         <div class="text-center">
-            <h2 class="text-lg font-semibold"> </h2>
             <p class="p-10 text-sm">
                 Silahkan catat apabila ada darah atau cairan yang keluar. Catat dengan informasi yang valid dengan cara klik
                 tanggal yang diinginkan
@@ -63,7 +62,7 @@
         </div>
     </div>
     <x-modal name="RecordModal" maxWidth="md">
-        <div class="bg-white p-6 rounded-xl shadow-lg w-full relative">
+        <div class="bg-white p-6  w-full relative">
             <h2 id="modalTitle" class="text-xl font-semibold mb-4">Catat Period</h2>
             <form id="recordForm" method="POST" class="space-y-4">
                 @csrf

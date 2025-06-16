@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('detail_program', function (Blueprint $table) {
         $table->id();
         $table->timestamps();
+        $table->string('bukti_pembayaran');
+        $table->enum('status_pembayaran', ['belum dikonfirmasi', 'sudah dikonfirmasi', 'ditolak'])->default('belum dikonfirmasi');
         $table->foreignId('role')->constrained('users')->onDelete('cascade');
         $table->foreignId('program_id')->constrained('program')->onDelete('cascade');
     });

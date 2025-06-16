@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\Period;
 use App\Models\PolaKebiasaan;
+use App\Models\DetailProgram;
 
 class DashboardController extends Controller
 {
@@ -15,7 +16,21 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         if ($user->role === 'admin') {
-            return view('Admin.PendaftaranProgram', ['noNavbar' => true]);
+             $belumDikonfirmasi = DetailProgram::with('program')
+                ->where('status_pembayaran', 'belum dikonfirmasi')
+                ->latest()
+                ->get();
+
+            $riwayat = DetailProgram::with('program')
+                ->where('status_pembayaran', '!=', 'belum dikonfirmasi')
+                ->latest()
+                ->get();
+
+            return view('Admin.PendaftaranProgram', [
+                'noNavbar' => true,
+                'belumDikonfirmasi' => $belumDikonfirmasi,
+                'riwayat' => $riwayat
+            ]);
         } elseif ($user->role === 'pengguna') {
             $user = auth()->user();
             $user = auth()->user();
