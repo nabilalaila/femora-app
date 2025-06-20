@@ -4,9 +4,6 @@
             <div class="flex items-center space-x-10">
                 <img src="{{ asset('images/logoFemora.png') }}" alt="Femora App" class="w-[80px] md:w-[80px]">
                 <div class="hidden md:flex space-x-8 text-gray-700 font-medium text-sm">
-                    <a href="#" class="hover:text-black font-poppins">About Us</a>
-                    <a href="#" class="hover:text-black font-poppins">Shop</a>
-                    <a href="#" class="hover:text-black font-poppins">Join Us</a>
                 </div>
             </div>
 
@@ -34,9 +31,6 @@
 
 <div id="mobile-menu"
     class="md:hidden hidden mt-4 text-center space-y-2 bg-white rounded-none shadow-md absolute left-0 right-0 z-10 px-6 py-4">
-    <a href="#" class="block text-gray-700 hover:text-black">About Us</a>
-    <a href="#" class="block text-gray-700 hover:text-black">Shop</a>
-    <a href="#" class="block text-gray-700 hover:text-black">Join Us</a>
 
     <div class="space-y-2 pt-2">
         <a href="{{ route('login') }}"

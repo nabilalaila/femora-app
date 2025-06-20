@@ -51,23 +51,3 @@
             @endforelse
         </tbody>
     </table>
-
-    <x-modal name="ModalLihatDetail" focusable>
-        <div class="p-6">
-            <h2 class="text-lg font-semibold mb-4">Detail Pendaftaran</h2>
-
-            <div class="space-y-2 text-sm">
-                <p><strong>User ID:</strong> <span id="riwayat_user_id" class="font-medium"></span></p>
-                <p><strong>Nama Program:</strong> <span id="riwayat_nama_program" class="font-medium"></span></p>
-                <p><strong>Tanggal Daftar:</strong> <span id="riwayat_tanggal_daftar" class="font-medium"></span></p>
-                <p><strong>Status Pembayaran:</strong> <span id="riwayat_status" class="font-medium"></span></p>
-                <div id="riwayat_bukti_pembayaran" class="mt-2"></div>
-            </div>
-
-            <div class="mt-6 flex justify-end">
-                <x-secondary-button x-on:click="$dispatch('close')" class="px-4 py-2">
-                    Tutup
-                </x-secondary-button>
-            </div>
-        </div>
-    </x-modal>

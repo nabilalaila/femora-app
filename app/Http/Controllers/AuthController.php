@@ -30,15 +30,13 @@ class AuthController extends Controller
                 'password' => 'required|string|min:6|confirmed',
             ]);
 
-
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
                 'role' => 'pengguna',
-                'is_mustaqirrah' => false,
+                'is_mustaqirrah' => 'belum isi',
             ]);
-
 
             return redirect()->route('login')->with('success', 'Registrasi berhasil');
         } catch (ValidationException $e) {

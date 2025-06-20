@@ -26,6 +26,13 @@
     @endif
 
     <div class="flex">
+        @if (session('success'))
+            <x-toast type="success" :message="session('success')" />
+        @endif
+
+        @if (session('error'))
+            <x-toast type="error" :message="session('error')" />
+        @endif
         @if (empty($noSidebar) && Auth::check())
             <aside class="w-64 hidden md:block">
                 @if (Auth::user()->role === 'pengguna')

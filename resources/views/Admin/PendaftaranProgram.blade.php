@@ -24,28 +24,64 @@
         </div>
     </div>
 
-    {{-- Modal Lihat Detail --}}
-    <x-modal name="ModalSetujui" focusable>
+    <x-modal name="ModalLihatDetail" focusable>
         <div class="p-6">
             <h2 class="text-lg font-semibold mb-4">Detail Pendaftaran</h2>
-            <input type="hidden" id="modal_pendaftaran_id">
 
             <div class="space-y-2 text-sm">
-                <p><strong>User ID:</strong> <span id="modal_user_id" class="font-medium"></span></p>
-                <p><strong>Nama Program:</strong> <span id="modal_nama_program" class="font-medium"></span></p>
-                <p><strong>Tanggal Daftar:</strong> <span id="modal_tanggal_daftar" class="font-medium"></span></p>
-                <p><strong>Bukti Pembayaran:</strong></p>
-                <div id="modal_bukti_pembayaran" class="mt-2"></div>
+                <p><strong>User ID:</strong> <span id="riwayat_user_id" class="font-medium"></span></p>
+                <p><strong>Nama Program:</strong> <span id="riwayat_nama_program" class="font-medium"></span></p>
+                <p><strong>Tanggal Daftar:</strong> <span id="riwayat_tanggal_daftar" class="font-medium"></span></p>
+                <p><strong>Status Pembayaran:</strong> <span id="riwayat_status" class="font-medium"></span></p>
+                <div id="riwayat_bukti_pembayaran" class="mt-2"></div>
             </div>
 
-            <form id="formPersetujuan" method="POST">
-                @csrf
-                <input type="hidden" name="id" id="form_action_url">
-                <div class="mt-6 flex justify-end">
-                    <x-secondary-button x-on:click="$dispatch('close')">Tutup</x-secondary-button>
-                </div>
-            </form>
+            <div class="mt-6 flex justify-end">
+                <x-secondary-button x-on:click="$dispatch('close')" class="px-4 py-2">
+                    Tutup
+                </x-secondary-button>
+            </div>
         </div>
+    </x-modal>
+
+    <x-modal name="ModalSetujui" id="modalSetujui">
+        <h2 class="text-lg font-semibold text-center mb-4">Detail Pendaftaran</h2>
+        <form id="formPersetujuan" method="POST">
+            @csrf
+            @method('PUT')
+            <div class="space-y-3 text-sm text-gray-700">
+                <input type="hidden" id="form_action_url" value="{{ route('pendaftaran.update') }}">
+                <input type="hidden" name="id" id="modal_pendaftaran_id">
+                <div>
+                    <label class="font-medium">User ID:</label>
+                    <div id="modal_user_id"></div>
+                </div>
+                <div>
+                    <label class="font-medium">Nama Program:</label>
+                    <div id="modal_nama_program"></div>
+                </div>
+                <div>
+                    <label class="font-medium">Tanggal Daftar:</label>
+                    <div id="modal_tanggal_daftar"></div>
+                </div>
+                <div>
+                    <label class="font-medium">Bukti Pembayaran</label>
+                    <div id="modal_bukti_pembayaran"></div>
+                </div>
+            </div>
+
+
+            <div class="flex justify-end gap-2 mt-6">
+                <button type="submit" name="action" value="setujui"
+                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                    Setujui
+                </button>
+                <button type="submit" name="action" value="tolak"
+                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+                    Tolak
+                </button>
+            </div>
+        </form>
     </x-modal>
 @endsection
 
@@ -58,15 +94,12 @@
             const sectionRiwayat = document.getElementById('section-riwayat');
 
             function activateTab(activeTab, inactiveTab, showSection, hideSection) {
-                // Style aktif
                 activeTab.classList.add('border-pink-500', 'text-pink-600');
                 activeTab.classList.remove('border-transparent', 'text-gray-500');
 
-                // Style nonaktif
                 inactiveTab.classList.remove('border-pink-500', 'text-pink-600');
                 inactiveTab.classList.add('border-transparent', 'text-gray-500');
 
-                // Toggle section
                 showSection.classList.remove('hidden');
                 hideSection.classList.add('hidden');
             }
@@ -100,7 +133,6 @@
 
 
         function lihatDetail(data) {
-            console.log("DATA", data); // untuk debug
 
             document.getElementById('modal_pendaftaran_id').value = data.id;
             document.getElementById('modal_user_id').innerText = data.role ?? '-';
@@ -114,7 +146,7 @@
 
             document.getElementById('modal_bukti_pembayaran').innerHTML = bukti;
 
-            document.getElementById('formPersetujuan').action = '{{ route('kalender.store') }}'; // Sesuaikan jika perlu
+            document.getElementById('formPersetujuan').action = '{{ route('pendaftaran.update') }}';
 
             window.dispatchEvent(new CustomEvent('open-modal', {
                 detail: 'ModalSetujui'

@@ -51,42 +51,4 @@
             @endforelse
         </tbody>
     </table>
-    <x-modal name="ModalSetujui" id="modalSetujui">
-        <h2 class="text-lg font-semibold text-center mb-4">Detail Pendaftaran</h2>
-        <form id="formPersetujuan" method="POST">
-            @csrf
-            @method('PUT')
-            <div class="space-y-3 text-sm text-gray-700">
-                <input type="hidden" id="form_action_url" value="{{ route('pendaftaran.update') }}">
-                <input type="hidden" name="id" id="modal_pendaftaran_id">
-                <div>
-                    <label class="font-medium">User ID:</label>
-                    <div id="modal_user_id"></div>
-                </div>
-                <div>
-                    <label class="font-medium">Nama Program:</label>
-                    <div id="modal_nama_program"></div>
-                </div>
-                <div>
-                    <label class="font-medium">Tanggal Daftar:</label>
-                    <div id="modal_tanggal_daftar"></div>
-                </div>
-                <div>
-                    <label class="font-medium">Bukti Pembayaran</label>
-                    <div id="modal_bukti_pembayaran"></div>
-                </div>
-            </div>
 
-
-            <div class="flex justify-end gap-2 mt-6">
-                <button type="submit" name="action" value="setujui"
-                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
-                    Setujui
-                </button>
-                <button type="submit" name="action" value="tolak"
-                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
-                    Tolak
-                </button>
-            </div>
-        </form>
-    </x-modal>

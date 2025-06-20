@@ -14,7 +14,6 @@
                 <form method="POST" action="{{ route('register') }}">
                     @csrf
 
-                    <!-- Nama -->
                     <label for="name" class="block mb-2 text-sm font-medium text-gray-900 font-poppins">Nama Lengkap <span class="text-red-500">*</span></label>
                     <input id="name" name="name" type="text" value="{{ old('name') }}" required autofocus
                         class="bg-white border border-gray-200 text-black text-sm rounded-2xl focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
@@ -22,7 +21,6 @@
                         <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
                     @enderror
 
-                    <!-- Email -->
                     <label for="email" class="block mt-4 mb-2 text-sm font-medium text-gray-900 font-poppins">Email <span class="text-red-500">*</span></label>
                     <input id="email" name="email" type="email" value="{{ old('email') }}" required
                         class="bg-white border border-gray-200 text-black text-sm rounded-2xl focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
